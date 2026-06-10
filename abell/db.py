@@ -47,6 +47,10 @@ def connect(db_path: str | Path) -> sqlite3.Connection:
     conn = sqlite3.connect(str(db_path), check_same_thread=False)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys=ON")
+    # API 连接与调度器连接共存于同一数据库文件：WAL 允许读写并发，
+    # busy_timeout 避免偶发写锁竞争直接报错
+    conn.execute("PRAGMA journal_mode=WAL")
+    conn.execute("PRAGMA busy_timeout=5000")
     conn.executescript(SCHEMA)
     conn.isolation_level = None  # autocommit
     return conn
