@@ -60,6 +60,7 @@ document.querySelectorAll('#tabs button').forEach((b) =>
 // ---------- 仪表盘 ----------
 
 let countdownTimer = null;
+let dashboardGen = 0;
 
 const KIND_TEXT = {
   normal: '正常打铃日',
@@ -76,7 +77,9 @@ function fmtCountdown(sec) {
 
 async function renderDashboard() {
   if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
+  const gen = ++dashboardGen;
   const st = await api.get('/api/status');
+  if (gen !== dashboardGen) return;
   const el = document.getElementById('tab-dashboard');
 
   let nextHtml;
@@ -100,10 +103,11 @@ async function renderDashboard() {
 
   if (st.next_bell) {
     let remain = st.next_bell.seconds;
-    countdownTimer = setInterval(() => {
+    const timer = setInterval(() => {
+      if (gen !== dashboardGen) { clearInterval(timer); return; }
       remain -= 1;
       if (remain <= 0) {
-        clearInterval(countdownTimer);
+        clearInterval(timer);
         countdownTimer = null;
         renderDashboard().catch((e) => toast(e.message, true));
         return;
@@ -111,13 +115,18 @@ async function renderDashboard() {
       const cd = document.getElementById('countdown');
       if (cd) cd.textContent = fmtCountdown(remain);
     }, 1000);
+    if (gen === dashboardGen) {
+      countdownTimer = timer;
+    } else {
+      clearInterval(timer);
+    }
   }
 
   document.getElementById('suspend-toggle').addEventListener('change', async (ev) => {
     try {
       await api.post('/api/suspend', { suspended: ev.target.checked });
       toast(ev.target.checked ? '已暂停打铃' : '已恢复打铃');
-      renderDashboard();
+      renderDashboard().catch((e) => toast(e.message, true));
     } catch (err) { toast(err.message, true); }
   });
 
@@ -474,7 +483,7 @@ async function renderDevice() {
       await api.put('/api/settings', {
         device_id: document.getElementById('dev-id').value,
         airplay_password: document.getElementById('dev-pwd').value,
-        volume: Number(document.getElementById('dev-vol').value),
+        volume: document.getElementById('dev-vol').value.trim(),
         backend: document.getElementById('dev-backend').value,
       });
       toast('已保存设置');
