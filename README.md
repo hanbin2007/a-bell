@@ -38,6 +38,7 @@ python3 -m venv .venv
 **开机自启（launchd）：**
 
 ```bash
+mkdir -p data   # launchd 日志目录需要先存在
 cp launchd/com.zhb.abell.plist ~/Library/LaunchAgents/
 launchctl load ~/Library/LaunchAgents/com.zhb.abell.plist
 ```

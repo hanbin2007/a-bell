@@ -36,17 +36,24 @@ export default function Dashboard({
   const [ringing, setRinging] = useState(false)
   const bellRef = useRef<SVGSVGElement>(null)
 
-  // 倒计时：以收到 status 的时刻为基准本地递减
+  // 倒计时：以收到 status 的时刻为基准本地递减。
+  // notifiedRef 保证归零只触发一次刷新——调度器最长 10 秒后才真正打铃，
+  // 期间 API 仍返回 seconds=0，不能每次都触发 onChanged 形成请求循环。
+  const notifiedRef = useRef(false)
   useEffect(() => {
     if (!status?.next_bell) {
       setRemaining(null)
       return
     }
+    if (status.next_bell.seconds > 0) notifiedRef.current = false
     const target = Date.now() + status.next_bell.seconds * 1000
     const tick = () => {
       const left = Math.max(0, Math.round((target - Date.now()) / 1000))
       setRemaining(left)
-      if (left <= 0) onChanged()
+      if (left <= 0 && !notifiedRef.current) {
+        notifiedRef.current = true
+        onChanged()
+      }
     }
     tick()
     const t = setInterval(tick, 1000)
