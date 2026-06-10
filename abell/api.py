@@ -6,7 +6,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Literal
 
-from fastapi import BackgroundTasks, FastAPI, Form, HTTPException, UploadFile
+from fastapi import BackgroundTasks, Body, FastAPI, Form, HTTPException, UploadFile
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, field_validator
@@ -302,7 +302,7 @@ def create_app(data_dir: Path, player, run_scheduler: bool = False) -> FastAPI:
         return out
 
     @app.put("/api/settings")
-    async def put_settings(body: dict):
+    async def put_settings(body: dict = Body(...)):
         for k in SETTING_KEYS:
             if k in body:
                 db.set_setting(conn, k, str(body[k]))
