@@ -96,3 +96,16 @@ sudo pmset repeat wakeorpoweron MTWRF 07:30:00
 ```
 
 在「设备」页将 backend 切换为 `afplay` 可在本机调试播放，无需连接 HomePod。
+
+### 前端开发
+
+前端位于 `frontend/`（Vite + React + TypeScript + Tailwind + shadcn/ui），构建产物输出到 `abell/web/`（已随仓库提交，部署无需 Node）：
+
+```bash
+cd frontend
+npm install
+npm run dev      # 开发服务器，/api 代理到 localhost:8333
+npm run build    # 构建并覆盖 abell/web/
+```
+
+改动前端后需重新 `npm run build` 并提交 `abell/web/`。
