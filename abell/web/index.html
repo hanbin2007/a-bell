@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>a-bell 打铃系统</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header>
+  <h1>🔔 a-bell</h1>
+  <nav id="tabs">
+    <button data-tab="dashboard" class="active">仪表盘</button>
+    <button data-tab="schedules">作息表</button>
+    <button data-tab="ringtones">铃声</button>
+    <button data-tab="calendar">日历</button>
+    <button data-tab="device">设备</button>
+    <button data-tab="logs">日志</button>
+  </nav>
+</header>
+<main>
+  <section id="tab-dashboard" class="tab active"></section>
+  <section id="tab-schedules" class="tab"></section>
+  <section id="tab-ringtones" class="tab"></section>
+  <section id="tab-calendar" class="tab"></section>
+  <section id="tab-device" class="tab"></section>
+  <section id="tab-logs" class="tab"></section>
+</main>
+<div id="toast"></div>
+<script src="/static/app.js"></script>
+</body>
+</html>
